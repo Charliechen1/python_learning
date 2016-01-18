@@ -4,22 +4,21 @@ import urllib.request
 import random
 import os
 
+website='http://desk.zol.com.cn/'
+
 def trade_spider(max_pages):
     page = 1
     while page <= max_pages:
-        url='http://bbs.h5galgame.me/forum.php?mod=forumdisplay&fid=142&page=' + str(page)
+        url='http://desk.zol.com.cn/2560x1600/' + str(page)+'.html'
         source_code = requests.get(url)
         plain_text = source_code.text
         soup = BeautifulSoup(plain_text)
         fw = open('source.txt','w')
-        for link in soup.findAll('a',{'class': 's xst'}):
+        for link in soup.findAll('a',{'class': 'pic'}):
             href = link.get('href')
-            title = link.string
-            #print("title:" + title)
-            #fw.write("title:" + title + "\n")
+            if 'http' not in href:
+                href = website + href
             get_single_item_data(href,fw)
-            #print("--------------------------------------------------");
-            #fw.write("--------------------------------------------------\n")
         page += 1
         fw.close()
 
@@ -29,10 +28,8 @@ def get_single_item_data(url,fw):
     soup = BeautifulSoup(plain_text)
     if not os.path.exists('pics'):
         os.mkdir('pics')
-    for img in soup.findAll('img'):
+    for img in soup.findAll('img',{'id' : 'bigImg'}):
         img_src = img.get('src')
-        if 'http' not in img_src:
-            img_src = "http://bbs.h5galgame.me/" + img_src
         download_web_img(img_src)
 
 def download_web_img(url):
